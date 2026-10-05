@@ -13,6 +13,9 @@ import '../../features/organization/domain/repositories/organization_repository.
 import '../../features/settings/data/datasources/settings_remote_datasource.dart';
 import '../../features/settings/data/repositories/settings_repository_impl.dart';
 import '../../features/settings/domain/repositories/settings_repository.dart';
+import '../../features/assets/data/datasources/assets_remote_datasource.dart';
+import '../../features/assets/data/repositories/assets_repository_impl.dart';
+import '../../features/assets/domain/repositories/assets_repository.dart';
 import '../../features/audit/data/datasources/audit_remote_datasource.dart';
 import '../../features/audit/data/repositories/audit_repository_impl.dart';
 import '../../features/audit/domain/repositories/audit_repository.dart';
@@ -42,4 +45,7 @@ void setupDependencies() {
 
   getIt.registerLazySingleton<AuditRemoteDataSource>(() => AuditRemoteDataSource(getIt()));
   getIt.registerLazySingleton<AuditRepository>(() => AuditRepositoryImpl(getIt()));
+
+  getIt.registerLazySingleton<AssetsRemoteDataSource>(() => AssetsRemoteDataSource(getIt()));
+  getIt.registerLazySingleton<AssetsRepository>(() => AssetsRepositoryImpl(getIt()));
 }

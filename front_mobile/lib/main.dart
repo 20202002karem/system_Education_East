@@ -5,6 +5,7 @@ import 'core/di/injection_container.dart';
 import 'core/network/api_client.dart';
 import 'core/routing/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'features/assets/domain/repositories/assets_repository.dart';
 import 'features/audit/domain/repositories/audit_repository.dart';
 import 'features/auth/domain/repositories/auth_repository.dart';
 import 'features/auth/presentation/cubit/auth_cubit.dart';
@@ -53,6 +54,7 @@ class _M1AppState extends State<M1App> {
         RepositoryProvider<OrganizationRepository>.value(value: getIt<OrganizationRepository>()),
         RepositoryProvider<SettingsRepository>.value(value: getIt<SettingsRepository>()),
         RepositoryProvider<AuditRepository>.value(value: getIt<AuditRepository>()),
+        RepositoryProvider<AssetsRepository>.value(value: getIt<AssetsRepository>()),
       ],
       child: BlocProvider.value(
         value: _authCubit,

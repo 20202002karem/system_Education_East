@@ -3,6 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../features/auth/presentation/cubit/auth_cubit.dart';
 import '../../features/auth/presentation/cubit/auth_state.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
+import '../../features/assets/domain/repositories/assets_repository.dart';
+import '../../features/assets/presentation/cubit/assets_list_cubit.dart';
+import '../../features/assets/presentation/pages/assets_list_page.dart';
 import '../../features/audit/presentation/pages/audit_log_page.dart';
 import '../../features/organization/presentation/cubit/sites_list_cubit.dart';
 import '../../features/organization/presentation/pages/sites_list_page.dart';
@@ -34,7 +37,7 @@ class AuthGate extends StatelessWidget {
       builder: (context, state) {
         return switch (state) {
           AuthAuthenticated(:final user) when user.role == UserRole.chairman => const LandingPage(),
-          AuthAuthenticated() => const _NonChairmanNotice(),
+          AuthAuthenticated(:final user) => _AssetsHome(role: user.role),
           _ => const LoginPage(),
         };
       },
@@ -42,28 +45,30 @@ class AuthGate extends StatelessWidget {
   }
 }
 
-class _NonChairmanNotice extends StatelessWidget {
-  const _NonChairmanNotice();
+/// Non-chairman roles have no M1 admin screens; their entry point is the M2
+/// assets list (read scope is enforced by the server per view_scope).
+class _AssetsHome extends StatelessWidget {
+  const _AssetsHome({required this.role});
+  final UserRole role;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-            const Text('لا توجد شاشات إدارية متاحة لدورك في M1 حاليًا.', textAlign: TextAlign.center),
-            const SizedBox(height: 12),
-            TextButton(onPressed: () => context.read<AuthCubit>().logout(), child: const Text('تسجيل الخروج')),
-          ]),
-        ),
-      ),
+    return BlocProvider(
+      create: (ctx) => AssetsListCubit(ctx.read<AssetsRepository>()),
+      child: AssetsListPage(role: role, onLogout: () => context.read<AuthCubit>().logout()),
     );
   }
 }
 
 Route<dynamic> onGenerateRoute(RouteSettings settings) {
   switch (settings.name) {
+    case '/assets':
+      return MaterialPageRoute(
+        builder: (ctx) => BlocProvider(
+          create: (c) => AssetsListCubit(c.read<AssetsRepository>()),
+          child: AssetsListPage(role: (ctx.read<AuthCubit>().state as AuthAuthenticated).user.role),
+        ),
+      );
     case '/users':
       return MaterialPageRoute(builder: (_) => BlocProvider(create: (_) => UsersListCubit(getIt()), child: const UsersListPage()));
     case '/sites':

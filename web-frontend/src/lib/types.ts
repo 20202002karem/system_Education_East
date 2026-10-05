@@ -109,3 +109,47 @@ export interface ApiErrorBody {
     fields?: Record<string, string[]>;
   };
 }
+
+// ---- M2 Assets (M2 Batch 2 data dictionary / Batch 3 contracts) ----
+export type AssetStatus = 'working' | 'under_maintenance' | 'broken' | 'stored' | 'in_transfer' | 'decommissioned';
+export type ManualAssetStatus = 'working' | 'under_maintenance' | 'broken' | 'stored';
+
+export interface Asset {
+  id: number;
+  inventory_no: string;
+  serial_no: string | null;
+  category_id: number;
+  current_site_id: number;
+  status: AssetStatus;
+  holder_text: string | null;
+  version: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AssetStatusEntry {
+  id: number;
+  from_status: AssetStatus;
+  to_status: AssetStatus;
+  changed_by: number;
+  reason: string | null;
+  changed_at: string;
+}
+
+export interface AssetCorrection {
+  id: number;
+  field_name: 'inventory_no' | 'serial_no';
+  old_value: string;
+  new_value: string;
+  corrected_by: number;
+  reason: string;
+  corrected_at: string;
+}
+
+export interface AssetLegacyNumber {
+  id: number;
+  legacy_number: string;
+  source: string | null;
+  added_by: number;
+  added_at: string;
+}

@@ -10,13 +10,15 @@ import { SitesListPage } from './features/organization/SitesListPage';
 import { SiteDetailPage } from './features/organization/SiteDetailPage';
 import { SettingsPage } from './features/settings/SettingsPage';
 import { ReferenceDataPage } from './features/settings/ReferenceDataPage';
+import { AssetsListPage } from './features/assets/AssetsListPage';
+import { AssetDetailPage } from './features/assets/AssetDetailPage';
 import { AuditLogPage } from './features/audit/AuditLogPage';
 import { ChainChecksPage } from './features/audit/ChainChecksPage';
 
 function RootRedirect() {
-  const { status } = useAuth();
+  const { status, user } = useAuth();
   if (status === 'initial' || status === 'loading') return <div className="page-loading">جارٍ التحميل…</div>;
-  return <Navigate to={status === 'authenticated' ? '/users' : '/login'} replace />;
+  return <Navigate to={status === 'authenticated' ? (user?.role === 'chairman' ? '/users' : '/assets') : '/login'} replace />;
 }
 
 function ForbiddenPage() {
@@ -44,6 +46,14 @@ export default function App() {
           <Route path="/" element={<RootRedirect />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/403" element={<ForbiddenPage />} />
+
+          {/* M2 Assets — every role may read (scope enforced server-side). */}
+          <Route element={<ProtectedRoute />}>
+            <Route element={<AppShell />}>
+              <Route path="/assets" element={<AssetsListPage />} />
+              <Route path="/assets/:id" element={<AssetDetailPage />} />
+            </Route>
+          </Route>
 
           {/* All M1 admin screens are chairman-only per Batch 3 §4. */}
           <Route element={<ProtectedRoute roles={['chairman']} />}>
