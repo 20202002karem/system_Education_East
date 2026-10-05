@@ -12,6 +12,7 @@ class LandingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tiles = [
+      ('الأجهزة', Icons.computer_outlined, '/assets'),
       ('المستخدمون', Icons.people_outline, '/users'),
       ('المواقع', Icons.apartment_outlined, '/sites'),
       ('الإعدادات', Icons.tune_outlined, '/settings'),

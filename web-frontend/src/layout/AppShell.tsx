@@ -9,7 +9,9 @@ import { Button } from '../components/Button';
  * "current user" area. This is UX convenience only; the backend still
  * enforces every request server-side regardless of what's shown here.
  */
+const allRoles = ['school_manager', 'chairman', 'secretary', 'engineer', 'technician'] as const;
 const navItems = [
+  { to: '/assets', label: 'الأجهزة', roles: allRoles },
   { to: '/users', label: 'المستخدمون', roles: ['chairman'] as const },
   { to: '/sites', label: 'المواقع', roles: ['chairman'] as const },
   { to: '/settings', label: 'الإعدادات', roles: ['chairman'] as const },

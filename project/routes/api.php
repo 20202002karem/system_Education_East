@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\V1\AssetController;
 use App\Http\Controllers\Api\V1\AuditLogController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\PermissionGrantController;
@@ -29,6 +30,18 @@ Route::prefix('v1')->group(function () {
     Route::middleware(['auth:sanctum', 'session.activity'])->group(function () {
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::get('/auth/me', [AuthController::class, 'me']);
+
+        // M2 — Assets (Batch 3 API-AST-01..09). Authorization lives in AssetAccess /
+        // the Form Requests (reads: per view_scope; writes: chairman or edit_assets).
+        Route::get('/assets', [AssetController::class, 'index']);
+        Route::post('/assets', [AssetController::class, 'store'])->middleware('idempotency');
+        Route::get('/assets/{asset}', [AssetController::class, 'show']);
+        Route::patch('/assets/{asset}', [AssetController::class, 'update']);
+        Route::post('/assets/{asset}/status-changes', [AssetController::class, 'changeStatus'])->middleware('idempotency');
+        Route::get('/assets/{asset}/status-history', [AssetController::class, 'statusHistory']);
+        Route::post('/assets/{asset}/identifier-corrections', [AssetController::class, 'correctIdentifier'])->middleware('idempotency');
+        Route::get('/assets/{asset}/identifier-corrections', [AssetController::class, 'identifierCorrections']);
+        Route::get('/assets/{asset}/legacy-numbers', [AssetController::class, 'legacyNumbers']);
 
         // Everything below is chairman-only in M1 (Batch 3 §4).
         Route::middleware('role:chairman')->group(function () {
