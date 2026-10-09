@@ -19,7 +19,7 @@ class AuthorizationTest extends TestCase
     protected function actingAsRole(string $role): User
     {
         $user = User::factory()->create(['role' => $role]);
-        Sanctum::actingAs($user, ['*']);
+        $this->signIn($user);
 
         return $user;
     }
@@ -36,15 +36,27 @@ class AuthorizationTest extends TestCase
     {
         $this->actingAsRole($role);
 
-        $this->getJson('/api/v1/users')->assertStatus(403);
+        // M3 BASELINE CHANGE: the secretary may read a minimal assignable-users list; everyone else stays 403.
+        if ($role === 'secretary') {
+            User::factory()->engineer()->create();
+            $res = $this->getJson('/api/v1/users')->assertOk();
+            $this->assertSame(['id', 'name', 'role'], array_keys($res->json('data.0')));
+        } else {
+            $this->getJson('/api/v1/users')->assertStatus(403);
+        }
     }
 
     /** @dataProvider nonChairmanRoles */
-    public function test_non_chairman_roles_cannot_read_sites(string $role): void
+    public function test_non_chairman_roles_read_only_scoped_minimal_sites(string $role): void
     {
         $this->actingAsRole($role);
+        \App\Models\Site::factory()->create();
 
-        $this->getJson('/api/v1/sites')->assertStatus(403);
+        $res = $this->getJson('/api/v1/sites')->assertOk();
+        foreach ($res->json('data') as $row) {
+            $this->assertSame(['id', 'type', 'code', 'name_ar', 'status'], array_keys($row));
+        }
+        $this->postJson('/api/v1/sites', [])->assertStatus(403); // writes stay chairman-only
     }
 
     /** @dataProvider nonChairmanRoles */

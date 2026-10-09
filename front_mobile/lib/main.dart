@@ -12,6 +12,9 @@ import 'features/auth/presentation/cubit/auth_cubit.dart';
 import 'features/organization/domain/repositories/organization_repository.dart';
 import 'features/settings/domain/repositories/settings_repository.dart';
 import 'features/users/domain/repositories/users_repository.dart';
+import 'features/requests/domain/repositories/requests_repository.dart';
+import 'features/tasks/domain/repositories/tasks_repository.dart';
+import 'features/notifications/domain/repositories/notifications_repository.dart';
 
 void main() {
   setupDependencies();
@@ -55,6 +58,9 @@ class _M1AppState extends State<M1App> {
         RepositoryProvider<SettingsRepository>.value(value: getIt<SettingsRepository>()),
         RepositoryProvider<AuditRepository>.value(value: getIt<AuditRepository>()),
         RepositoryProvider<AssetsRepository>.value(value: getIt<AssetsRepository>()),
+        RepositoryProvider<RequestsRepository>.value(value: getIt<RequestsRepository>()),
+        RepositoryProvider<TasksRepository>.value(value: getIt<TasksRepository>()),
+        RepositoryProvider<NotificationsRepository>.value(value: getIt<NotificationsRepository>()),
       ],
       child: BlocProvider.value(
         value: _authCubit,

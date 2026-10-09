@@ -82,7 +82,8 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
   }
 
   const headers: Record<string, string> = { Accept: 'application/json' };
-  if (body !== undefined) headers['Content-Type'] = 'application/json';
+  const isForm = typeof FormData !== 'undefined' && body instanceof FormData;
+  if (body !== undefined && !isForm) headers['Content-Type'] = 'application/json'; // multipart sets its own boundary
   const token = getToken();
   if (token) headers['Authorization'] = `Bearer ${token}`;
   if (idempotent) headers['Idempotency-Key'] = newIdempotencyKey();
@@ -92,7 +93,7 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
     response = await fetch(url.toString(), {
       method,
       headers,
-      body: body !== undefined ? JSON.stringify(body) : undefined,
+      body: body === undefined ? undefined : isForm ? (body as FormData) : JSON.stringify(body),
       signal,
     });
   } catch {

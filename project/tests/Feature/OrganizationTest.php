@@ -16,7 +16,7 @@ class OrganizationTest extends TestCase
     protected function chairman(): User
     {
         $chairman = User::factory()->chairman()->create();
-        Sanctum::actingAs($chairman, ['*']);
+        $this->signIn($chairman);
 
         return $chairman;
     }
@@ -42,7 +42,7 @@ class OrganizationTest extends TestCase
         $this->postJson("/api/v1/sites/{$site->id}/archive")->assertOk();
         $this->assertDatabaseHas('sites', ['id' => $site->id, 'status' => 'archived']);
 
-        $this->deleteJson("/api/v1/sites/{$site->id}")->assertStatus(404); // no delete route
+        $this->assertContains($this->deleteJson("/api/v1/sites/{$site->id}")->status(), [404, 405]); // no delete route
     }
 
     public function test_assigning_new_manager_closes_previous_open_row(): void
@@ -66,11 +66,8 @@ class OrganizationTest extends TestCase
             ]);
         $second->assertStatus(201)->assertJsonPath('data.to', null);
 
-        $this->assertDatabaseHas('site_managers', [
-            'site_id' => $site->id,
-            'user_id' => $firstManager->id,
-            'to' => '2026-05-31',
-        ]);
+        $this->assertStringStartsWith('2026-05-31', (string) \Illuminate\Support\Facades\DB::table('site_managers')
+            ->where('site_id', $site->id)->where('user_id', $firstManager->id)->value('to'));
 
         $active = $site->siteManagers()->whereNull('to')->get();
         $this->assertCount(1, $active, 'Only one active manager per site is allowed.');

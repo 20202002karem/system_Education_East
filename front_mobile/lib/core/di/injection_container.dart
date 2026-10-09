@@ -19,6 +19,15 @@ import '../../features/assets/domain/repositories/assets_repository.dart';
 import '../../features/audit/data/datasources/audit_remote_datasource.dart';
 import '../../features/audit/data/repositories/audit_repository_impl.dart';
 import '../../features/audit/domain/repositories/audit_repository.dart';
+import '../../features/requests/data/requests_remote_datasource.dart';
+import '../../features/requests/data/requests_repository_impl.dart';
+import '../../features/requests/domain/repositories/requests_repository.dart';
+import '../../features/tasks/data/tasks_remote_datasource.dart';
+import '../../features/tasks/data/tasks_repository_impl.dart';
+import '../../features/tasks/domain/repositories/tasks_repository.dart';
+import '../../features/notifications/data/notifications_remote_datasource.dart';
+import '../../features/notifications/data/notifications_repository_impl.dart';
+import '../../features/notifications/domain/repositories/notifications_repository.dart';
 
 final getIt = GetIt.instance;
 
@@ -48,4 +57,12 @@ void setupDependencies() {
 
   getIt.registerLazySingleton<AssetsRemoteDataSource>(() => AssetsRemoteDataSource(getIt()));
   getIt.registerLazySingleton<AssetsRepository>(() => AssetsRepositoryImpl(getIt()));
+
+  // M3 — requests, tasks, internal notifications.
+  getIt.registerLazySingleton<RequestsRemoteDataSource>(() => RequestsRemoteDataSource(getIt()));
+  getIt.registerLazySingleton<RequestsRepository>(() => RequestsRepositoryImpl(getIt()));
+  getIt.registerLazySingleton<TasksRemoteDataSource>(() => TasksRemoteDataSource(getIt()));
+  getIt.registerLazySingleton<TasksRepository>(() => TasksRepositoryImpl(getIt()));
+  getIt.registerLazySingleton<NotificationsRemoteDataSource>(() => NotificationsRemoteDataSource(getIt()));
+  getIt.registerLazySingleton<NotificationsRepository>(() => NotificationsRepositoryImpl(getIt()));
 }

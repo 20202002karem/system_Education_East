@@ -35,6 +35,16 @@ class UserController extends Controller
     {
         $perPage = min((int) $request->query('per_page', 20), 100);
         $query = User::query();
+        $actor = $request->user();
+        $minimal = false;
+        if (! $actor->isChairman()) {
+            // M3 BASELINE CHANGE (read-only): the secretary picks assignees; only active engineers/technicians, id/name/role.
+            if ($actor->role !== 'secretary') {
+                abort(403);
+            }
+            $query->where('status', 'active')->whereIn('role', ['engineer', 'technician']);
+            $minimal = true;
+        }
 
         if ($request->filled('role')) {
             $query->where('role', $request->query('role'));
@@ -46,7 +56,7 @@ class UserController extends Controller
         $paginator = $query->orderBy('id')->paginate($perPage, ['*'], 'page', (int) $request->query('page', 1));
 
         return ApiResponse::ok(
-            $paginator->items(),
+            $minimal ? collect($paginator->items())->map(fn ($u) => $u->only(['id', 'name', 'role']))->all() : $paginator->items(),
             200,
             ['page' => $paginator->currentPage(), 'per_page' => $perPage, 'total' => $paginator->total()]
         );

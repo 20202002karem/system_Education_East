@@ -16,7 +16,7 @@ class SettingsReferenceTest extends TestCase
     protected function chairman(): User
     {
         $chairman = User::factory()->chairman()->create();
-        Sanctum::actingAs($chairman, ['*']);
+        $this->signIn($chairman);
 
         return $chairman;
     }

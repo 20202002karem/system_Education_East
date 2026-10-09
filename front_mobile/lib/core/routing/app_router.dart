@@ -17,6 +17,15 @@ import '../../features/users/domain/entities/user.dart';
 import '../../features/users/presentation/cubit/users_list_cubit.dart';
 import '../../features/users/presentation/pages/users_list_page.dart';
 import '../di/injection_container.dart';
+import '../../features/requests/domain/repositories/requests_repository.dart';
+import '../../features/requests/presentation/cubit/requests_list_cubit.dart';
+import '../../features/requests/presentation/pages/requests_list_page.dart';
+import '../../features/tasks/domain/repositories/tasks_repository.dart';
+import '../../features/tasks/presentation/cubit/tasks_list_cubit.dart';
+import '../../features/tasks/presentation/pages/tasks_list_page.dart';
+import '../../features/notifications/domain/repositories/notifications_repository.dart';
+import '../../features/notifications/presentation/cubit/notifications_cubit.dart';
+import '../../features/notifications/presentation/pages/notifications_page.dart';
 import 'landing_page.dart';
 
 /// Navigation is M1-only (instructions §15): Auth → Landing → Users /
@@ -69,6 +78,12 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
           child: AssetsListPage(role: (ctx.read<AuthCubit>().state as AuthAuthenticated).user.role),
         ),
       );
+    case '/requests':
+      return MaterialPageRoute(builder: (c) => BlocProvider(create: (_) => RequestsListCubit(c.read<RequestsRepository>()), child: const RequestsListPage()));
+    case '/tasks':
+      return MaterialPageRoute(builder: (c) => BlocProvider(create: (_) => TasksListCubit(c.read<TasksRepository>()), child: const TasksListPage()));
+    case '/notifications':
+      return MaterialPageRoute(builder: (c) => BlocProvider(create: (_) => NotificationsCubit(c.read<NotificationsRepository>()), child: const NotificationsPage()));
     case '/users':
       return MaterialPageRoute(builder: (_) => BlocProvider(create: (_) => UsersListCubit(getIt()), child: const UsersListPage()));
     case '/sites':

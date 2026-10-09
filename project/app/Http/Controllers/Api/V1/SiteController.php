@@ -27,6 +27,14 @@ class SiteController extends Controller
     {
         $perPage = min((int) $request->query('per_page', 20), 100);
         $query = Site::query();
+        if (! $request->user()->isChairman()) {
+            // M3 BASELINE CHANGE (read-only): other roles see only active sites inside their scope, minimal fields.
+            $ids = \App\Support\RequestAccess::siteIds($request->user());
+            $query->where('status', 'active');
+            if ($ids !== null) {
+                $query->whereIn('id', $ids);
+            }
+        }
 
         if ($request->filled('type')) {
             $query->where('type', $request->query('type'));
@@ -37,8 +45,12 @@ class SiteController extends Controller
 
         $paginator = $query->orderBy('id')->paginate($perPage, ['*'], 'page', (int) $request->query('page', 1));
 
+        $items = $request->user()->isChairman()
+            ? $paginator->items()
+            : collect($paginator->items())->map(fn ($s) => $s->only(['id', 'type', 'code', 'name_ar', 'status']))->all();
+
         return ApiResponse::ok(
-            $paginator->items(), 200,
+            $items, 200,
             ['page' => $paginator->currentPage(), 'per_page' => $perPage, 'total' => $paginator->total()]
         );
     }
@@ -62,8 +74,18 @@ class SiteController extends Controller
         return $response;
     }
 
-    public function show(Site $site)
+    public function show(Request $request, Site $site)
     {
+        $user = $request->user();
+        if (! $user->isChairman()) {
+            $ids = \App\Support\RequestAccess::siteIds($user);
+            if ($site->status !== 'active' || ($ids !== null && ! in_array($site->id, $ids, true))) {
+                abort(404);
+            }
+
+            return ApiResponse::ok($site->only(['id', 'type', 'code', 'name_ar', 'status']));
+        }
+
         return ApiResponse::ok($site);
     }
 

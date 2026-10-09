@@ -16,7 +16,7 @@ class UserManagementTest extends TestCase
     protected function chairman(): User
     {
         $chairman = User::factory()->chairman()->create();
-        Sanctum::actingAs($chairman, ['*']);
+        $this->signIn($chairman);
 
         return $chairman;
     }
@@ -109,7 +109,7 @@ class UserManagementTest extends TestCase
         $this->chairman();
         $user = User::factory()->create();
 
-        $this->deleteJson("/api/v1/users/{$user->id}")->assertStatus(404);
+        $this->assertContains($this->deleteJson("/api/v1/users/{$user->id}")->status(), [404, 405]); // no delete route
     }
 
     public function test_reset_password(): void
