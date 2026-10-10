@@ -12,13 +12,21 @@ import { SettingsPage } from './features/settings/SettingsPage';
 import { ReferenceDataPage } from './features/settings/ReferenceDataPage';
 import { AssetsListPage } from './features/assets/AssetsListPage';
 import { AssetDetailPage } from './features/assets/AssetDetailPage';
+import { RequestsListPage } from './features/requests/RequestsListPage';
+import { RequestFormPage } from './features/requests/RequestFormPage';
+import { RequestDetailPage } from './features/requests/RequestDetailPage';
+import { TasksListPage } from './features/tasks/TasksListPage';
+import { TaskDetailPage } from './features/tasks/TaskDetailPage';
+import { ProposalsPage } from './features/proposals/ProposalsPage';
+import { NotificationsPage } from './features/notifications/NotificationsPage';
+import { DraftsPage } from './features/drafts/DraftsPage';
 import { AuditLogPage } from './features/audit/AuditLogPage';
 import { ChainChecksPage } from './features/audit/ChainChecksPage';
 
 function RootRedirect() {
   const { status, user } = useAuth();
   if (status === 'initial' || status === 'loading') return <div className="page-loading">جارٍ التحميل…</div>;
-  return <Navigate to={status === 'authenticated' ? (user?.role === 'chairman' ? '/users' : '/assets') : '/login'} replace />;
+  return <Navigate to={status === 'authenticated' ? (user?.role === 'chairman' ? '/users' : '/requests') : '/login'} replace />;
 }
 
 function ForbiddenPage() {
@@ -53,6 +61,28 @@ export default function App() {
               <Route path="/assets" element={<AssetsListPage />} />
               <Route path="/assets/:id" element={<AssetDetailPage />} />
             </Route>
+          </Route>
+
+          {/* M3 — Requests, Tasks, Proposals, Notifications, Drafts (scope + authority enforced server-side). */}
+          <Route element={<ProtectedRoute />}>
+            <Route element={<AppShell />}>
+              <Route path="/requests" element={<RequestsListPage />} />
+              <Route path="/requests/:id" element={<RequestDetailPage />} />
+              <Route path="/notifications" element={<NotificationsPage />} />
+              <Route path="/drafts" element={<DraftsPage />} />
+            </Route>
+          </Route>
+          <Route element={<ProtectedRoute roles={['school_manager', 'secretary']} />}>
+            <Route element={<AppShell />}><Route path="/requests/new" element={<RequestFormPage />} /></Route>
+          </Route>
+          <Route element={<ProtectedRoute roles={['chairman', 'secretary', 'engineer', 'technician']} />}>
+            <Route element={<AppShell />}>
+              <Route path="/tasks" element={<TasksListPage />} />
+              <Route path="/tasks/:id" element={<TaskDetailPage />} />
+            </Route>
+          </Route>
+          <Route element={<ProtectedRoute roles={['chairman', 'secretary']} />}>
+            <Route element={<AppShell />}><Route path="/proposals" element={<ProposalsPage />} /></Route>
           </Route>
 
           {/* All M1 admin screens are chairman-only per Batch 3 §4. */}

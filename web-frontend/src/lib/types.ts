@@ -153,3 +153,123 @@ export interface AssetLegacyNumber {
   added_by: number;
   added_at: string;
 }
+
+// ---- M3 Requests & Tasks (M3 Batch 2 data dictionary / Batch 3 contracts) ----
+export type RequestStatus =
+  | 'new' | 'triaged' | 'assigned' | 'in_progress' | 'held' | 'reopened_pending_assignment' | 'closed' | 'cancelled';
+export type Priority = 'emergency' | 'high' | 'normal' | 'low';
+export type TaskStatus = 'new' | 'assigned' | 'in_progress' | 'held' | 'completed' | 'cancelled';
+
+export interface RequestCycle {
+  id: number;
+  request_id: number;
+  cycle_no: number;
+  status: RequestStatus;
+  assignee_user_id: number | null;
+  assignee_name?: string | null;
+  started_at: string | null;
+  closed_at: string | null;
+  closure_action: string | null;
+  closure_result: string | null;
+  closure_effort_minutes: number | null;
+  hold_reason: string | null;
+  version: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface RequestCancellationInfo {
+  reason_category: string;
+  reason_text: string;
+  work_done_summary: string | null;
+  cancelled_by: number;
+  stage: 'before_assignment' | 'after_start';
+  cancelled_at: string;
+}
+
+export interface ServiceRequest {
+  id: number;
+  ref_no: string;
+  origin_site_id: number;
+  origin_site_name?: string | null;
+  asset_id: number | null;
+  requester_user_id: number | null;
+  requester_name: string | null;
+  registered_by_user_id: number;
+  channel_id: number;
+  request_type_id: number | null;
+  suggested_priority: Priority | null;
+  priority: Priority | null;
+  description: string;
+  current_cycle_no: number;
+  reopen_count: number;
+  status: RequestStatus | null;
+  cycle: RequestCycle | null;
+  cancellation: RequestCancellationInfo | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface RequestAssignment {
+  id: number; cycle_id: number; assignee_id: number; assigned_by: number; reason: string | null; from: string; to: string | null;
+}
+
+export interface RequestNote {
+  id: number; cycle_id: number; author_id: number; author_name?: string | null; visibility: 'internal' | 'external'; body: string; created_at: string;
+}
+
+export interface Task {
+  id: number;
+  ref_no: string;
+  task_type_id: number;
+  title: string;
+  description: string | null;
+  request_cycle_id: number | null;
+  asset_id: number | null;
+  site_id: number | null;
+  assignee_id: number | null;
+  status: TaskStatus;
+  due_at: string | null;
+  result_summary: string | null;
+  created_by: number;
+  version: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Proposal {
+  id: number;
+  type: 'reassign' | 'cancel';
+  subject_type: 'request' | 'task';
+  subject_id: number;
+  proposer_id: number;
+  reason: string;
+  work_done_summary: string | null;
+  status: 'pending' | 'accepted' | 'rejected';
+  decided_by: number | null;
+  decided_at: string | null;
+  created_at: string;
+}
+
+export interface Attachment {
+  id: number;
+  owner_type: 'request' | 'request_note' | 'task';
+  owner_id: number;
+  uploaded_by: number;
+  sha256: string;
+  size_bytes: number;
+  mime_type: string;
+  original_filename: string;
+  created_at: string;
+}
+
+export type DraftFormType = 'request_create' | 'note' | 'closure' | 'cancellation' | 'proposal';
+export interface Draft {
+  id: number; form_type: DraftFormType; form_key: string | null; payload: Record<string, unknown>; updated_at: string;
+}
+
+export interface AppNotification {
+  id: number; event_type: string; source_type: 'request' | 'task'; source_id: number; message: string; read_at: string | null; created_at: string;
+}
+
+export interface AssignableUser { id: number; name: string; role: Role }

@@ -18,6 +18,9 @@ class LandingPage extends StatelessWidget {
       ('الإعدادات', Icons.tune_outlined, '/settings'),
       ('القوائم المرجعية', Icons.list_alt_outlined, '/reference'),
       ('سجل التدقيق', Icons.fact_check_outlined, '/audit'),
+      ('الطلبات', Icons.assignment_outlined, '/requests'),
+      ('المهام', Icons.task_alt_outlined, '/tasks'),
+      ('الإشعارات', Icons.notifications_outlined, '/notifications'),
     ];
 
     return Scaffold(

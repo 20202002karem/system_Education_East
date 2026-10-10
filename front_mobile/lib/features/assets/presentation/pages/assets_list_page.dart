@@ -56,6 +56,13 @@ class _AssetsListPageState extends State<AssetsListPage> {
       appBar: AppBar(
         title: const Text('الأجهزة'),
         actions: [
+          // M3 entry points for non-chairman roles (their landing screen is this list).
+          if (widget.onLogout != null) ...[
+            IconButton(icon: const Icon(Icons.assignment_outlined), tooltip: 'الطلبات', onPressed: () => Navigator.of(context).pushNamed('/requests')),
+            if (widget.role != UserRole.schoolManager)
+              IconButton(icon: const Icon(Icons.task_alt_outlined), tooltip: 'المهام', onPressed: () => Navigator.of(context).pushNamed('/tasks')),
+            IconButton(icon: const Icon(Icons.notifications_outlined), tooltip: 'الإشعارات', onPressed: () => Navigator.of(context).pushNamed('/notifications')),
+          ],
           if (widget.onLogout != null) IconButton(icon: const Icon(Icons.logout), tooltip: 'تسجيل الخروج', onPressed: widget.onLogout),
           if (canCreate)
             IconButton(

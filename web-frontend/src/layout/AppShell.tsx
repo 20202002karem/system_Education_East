@@ -11,6 +11,11 @@ import { Button } from '../components/Button';
  */
 const allRoles = ['school_manager', 'chairman', 'secretary', 'engineer', 'technician'] as const;
 const navItems = [
+  { to: '/requests', label: 'الطلبات', roles: allRoles },
+  { to: '/tasks', label: 'المهام', roles: ['chairman', 'secretary', 'engineer', 'technician'] as const },
+  { to: '/proposals', label: 'الاقتراحات', roles: ['chairman', 'secretary'] as const },
+  { to: '/notifications', label: 'الإشعارات', roles: allRoles },
+  { to: '/drafts', label: 'المسودات', roles: allRoles },
   { to: '/assets', label: 'الأجهزة', roles: allRoles },
   { to: '/users', label: 'المستخدمون', roles: ['chairman'] as const },
   { to: '/sites', label: 'المواقع', roles: ['chairman'] as const },

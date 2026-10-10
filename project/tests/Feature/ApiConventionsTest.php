@@ -20,7 +20,7 @@ class ApiConventionsTest extends TestCase
     public function test_list_endpoint_returns_pagination_meta(): void
     {
         $chairman = User::factory()->chairman()->create();
-        Sanctum::actingAs($chairman, ['*']);
+        $this->signIn($chairman);
         User::factory()->count(3)->create();
 
         $response = $this->getJson('/api/v1/users?page=1&per_page=20');
@@ -31,7 +31,7 @@ class ApiConventionsTest extends TestCase
     public function test_validation_error_uses_422_and_fields_envelope(): void
     {
         $chairman = User::factory()->chairman()->create();
-        Sanctum::actingAs($chairman, ['*']);
+        $this->signIn($chairman);
 
         $response = $this->withHeader('Idempotency-Key', 'k1')->postJson('/api/v1/users', [
             'name' => '',
